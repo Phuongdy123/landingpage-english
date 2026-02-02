@@ -1,19 +1,16 @@
 {
-  "redirects": [
+  "routes": [
     {
-      "source": "/",
-      "destination": "/views/index.html",
-      "permanent": true
+      "src": "^/$",
+      "dest": "/views/index.html"
     },
     {
-      "source": "/views",
-      "destination": "/views/index.html",
-      "permanent": true
+      "src": "^/views/?$",  
+      "dest": "/views/index.html"
     },
     {
-      "source": "/views/",
-      "destination": "/views/index.html",
-      "permanent": true
+      "src": "^/views/(.*)$",
+      "dest": "/views/$1"
     }
   ]
 }
