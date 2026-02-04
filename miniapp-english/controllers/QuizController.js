@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🔴 CẤU HÌNH DEV TOOL (BẬT/TẮT NÚT RESET)
     // false = Đang Test (HIỆN nút Reset màu đỏ)
     // true  = Chạy thật/Gửi khách (ẨN nút Reset)
-    const IS_LOCK = true; 
+    const IS_LOCK = false; 
 
     // Biến toàn cục
     let config = (typeof defaultConfig !== 'undefined') ? { ...defaultConfig } : {}; 
@@ -83,14 +83,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            console.log("🚀 Đang gửi dữ liệu lên Google Sheet/Bizfly...");
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 body: formData,
                 mode: 'no-cors' 
             });
-            console.log("✅ Data sent to Sheet");
+            console.log("✅ Đã gửi thành công!");
         } catch (error) {
-            console.error("❌ Send Error:", error);
+            console.error("❌ Lỗi gửi dữ liệu:", error);
         }
     }
 
@@ -169,7 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 4. XỬ LÝ SỰ KIỆN (EVENT LISTENERS) ---
     // ============================================================
 
-    // --- NÚT START (Logic kiểm tra người chơi cũ) ---
+    // --- NÚT START (LOGIC KIỂM TRA NGƯỜI CHƠI CŨ) ---
     const startBtn = document.getElementById('start-btn');
     if (startBtn) {
         startBtn.addEventListener('click', () => {
@@ -183,23 +184,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 participantData = savedData;
                 score = savedData.score || 0;
                 
-                // Đảm bảo load được câu hỏi để hiển thị giao diện kết quả
+                // Load câu hỏi để hiển thị (tránh lỗi giao diện)
                 if (typeof setQuestionsByLanguageAndLevel === 'function') {
-                    // Nếu không biết user thi đề nào, load mặc định en/medium để tránh lỗi
                     const lang = savedData.language || 'en';
                     const level = savedData.level || 'medium';
                     setQuestionsByLanguageAndLevel(lang, level);
                 }
 
                 showScreen('results');
-                showResults(); // Render lại kết quả
                 
-                // Thông báo nhẹ
-                // alert(`Chào mừng ${savedData.full_name} quay lại! Đây là kết quả bài thi trước của bạn.`);
+                // QUAN TRỌNG: Gọi showResults với tham số true (isReplay = true)
+                // Để KHÔNG gửi dữ liệu lại
+                showResults(true); 
                 return;
             }
 
-            // 2. NGƯỜI DÙNG ĐANG THI DỞ (Đã điền form nhưng chưa xong)
+            // 2. NGƯỜI DÙNG ĐANG THI DỞ (Chưa xong)
             if (savedData && savedData.full_name) {
                 participantData = savedData;
                 participantData.language = 'en'; 
@@ -263,6 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
             };
             
             saveSession(participantData);
+            
+            // Gửi dữ liệu đăng ký (lead) đi lần đầu
             await sendDataToGoogleSheet(participantData);
             
             submitBtn.innerHTML = originalText;
@@ -281,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- CHỌN LANGUAGE / LEVEL ---
+    // --- CÁC NÚT CHỨC NĂNG KHÁC (GIỮ NGUYÊN) ---
     const langButtons = document.querySelectorAll('.lang-btn');
     langButtons.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -314,7 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- NAVIGATION ---
     const nextBtn = document.getElementById('next-btn');
     if (nextBtn) nextBtn.addEventListener('click', nextQuestion);
 
@@ -328,7 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- TIMER & QUIZ LOGIC ---
+    // --- LOGIC QUIZ (TIMER & QUESTION) ---
     function startTimer() {
         timeLeft = 15; 
         const totalTime = 15; 
@@ -419,7 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (q.type === 'writing') {
             const wrapper = document.createElement('div');
             wrapper.className = "flex flex-col w-full gap-3 mt-2"; 
-            
             const questionTextContainer = document.createElement('div');
             questionTextContainer.className = "w-full mb-1 text-center";
             const questionText = document.createElement('div');
@@ -563,7 +563,8 @@ document.addEventListener('DOMContentLoaded', () => {
             currentQuestion++;
             renderQuestion();
         } else {
-            await showResults();
+            // Đây là lúc thi xong -> Gọi showResults(false) để GỬI dữ liệu
+            await showResults(false);
         }
     }
 
@@ -612,9 +613,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('next-btn-icon').textContent = '➡️';
     }
 
-    // --- KẾT QUẢ & GỬI DỮ LIỆU CUỐI ---
-    async function showResults() {
-        // --- XỬ LÝ NẾU RELOAD TRANG (correctCount bị reset về 0) ---
+    // ============================================================
+    // --- SHOW RESULTS (ĐÃ SỬA: CHẶN GỬI LẠI) ---
+    // ============================================================
+    // isReplay = true: Chỉ xem lại (không gửi)
+    // isReplay = false: Vừa thi xong (gửi)
+    async function showResults(isReplay = false) {
+        
+        // Fix lỗi hiển thị 0/10 khi reload
         if (score > 0 && correctCount === 0 && questions && questions.length > 0) {
             correctCount = Math.round((score * questions.length) / 100);
         }
@@ -693,36 +699,39 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 `;
             }
-            if (typeof createConfetti === 'function') createConfetti();
+            if (typeof createConfetti === 'function' && !isReplay) createConfetti();
         }
 
-        // --- CẬP NHẬT DỮ LIỆU & GỬI LẦN CUỐI ---
+        // --- CẬP NHẬT DỮ LIỆU ---
         if (participantData) {
             participantData.score = score;
             participantData.rank = rankInfo.label;
-            // Đánh dấu đã hoàn thành (quan trọng để chặn thi lại)
             if(!participantData.completed_at) {
                 participantData.completed_at = new Date().toISOString();
             }
             saveSession(participantData); 
 
-            // Chỉ gửi nếu chưa gửi kết quả lần này
-            // (Tuy nhiên ở đây ta cứ gửi đè để update điểm chính xác nhất)
-            if (typeof sendDataToGoogleSheet === 'function') {
-                showLoading(true);
-                try {
-                    await sendDataToGoogleSheet(participantData);
-                } catch (err) {
-                    console.error("Lỗi gửi dữ liệu:", err);
-                } finally {
-                    showLoading(false);
+            // --- 🛑 CHỐT CHẶN Ở ĐÂY 🛑 ---
+            // Chỉ gửi dữ liệu nếu KHÔNG PHẢI là xem lại (isReplay = false)
+            if (!isReplay) {
+                if (typeof sendDataToGoogleSheet === 'function') {
+                    showLoading(true);
+                    try {
+                        await sendDataToGoogleSheet(participantData);
+                    } catch (err) {
+                        console.error("Lỗi gửi dữ liệu:", err);
+                    } finally {
+                        showLoading(false);
+                    }
                 }
+            } else {
+                console.log("⚠️ Chế độ xem lại (Replay): Không gửi dữ liệu lên Server.");
             }
         }
         showScreen('results');
     }
 
-    // --- CÁC NÚT LIÊN HỆ (Zalo / Messenger) ---
+    // --- CÁC NÚT LIÊN HỆ ---
     const messengerBtn = document.getElementById('messenger-btn');
     if (messengerBtn) {
         messengerBtn.addEventListener('click', () => {
@@ -763,17 +772,15 @@ document.addEventListener('DOMContentLoaded', () => {
     initDataSDK();
 
     // ============================================================
-    // --- 5. DEV TOOL: NÚT RESET DỮ LIỆU (CẤU HÌNH) ---
+    // --- 5. DEV TOOL: NÚT RESET DỮ LIỆU ---
     // ============================================================
     function addDevResetButton() {
-        // Nếu đang khóa (IS_LOCK = true) thì thoát luôn, không vẽ nút
         if (IS_LOCK) return;
 
         const btn = document.createElement('button');
         btn.innerHTML = '🔄 RESET DATA';
         btn.title = "Click để xóa dữ liệu test và làm lại từ đầu";
         
-        // Style nút: Góc trái dưới, màu đỏ
         btn.style.cssText = `
             position: fixed;
             bottom: 20px;
@@ -826,4 +833,4 @@ function createConfetti() {
         container.appendChild(el);
         setTimeout(() => el.remove(), 3000);
     }
-}
+}   
