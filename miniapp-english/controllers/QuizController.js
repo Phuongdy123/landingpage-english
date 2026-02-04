@@ -1,12 +1,21 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
-    // --- 1. CẤU HÌNH HỆ THỐNG ---
+    // --- 1. CẤU HÌNH HỆ THỐNG & DEV TOOL ---
     // ============================================================
-    // URL Google Apps Script (Đã cập nhật theo link bạn gửi)
+    
+    // URL Google Apps Script
     const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7GnhioT3_PLSrLaYMPnfKKL7zYPlWYBsRHi2HvvLoIMoDRB8mRGVzs75NPkfNPUjwEg/exec';
+    
+    // Key lưu cache
+    const STORAGE_KEY = 'quiz_user_session_v8_final'; 
+
+    // 🔴 CẤU HÌNH DEV TOOL (BẬT/TẮT NÚT RESET)
+    // false = Đang Test (HIỆN nút Reset màu đỏ)
+    // true  = Chạy thật/Gửi khách (ẨN nút Reset)
+    const IS_LOCK = true; 
 
     // Biến toàn cục
-    let config = { ...defaultConfig }; // Đảm bảo defaultConfig đã được load từ file config
+    let config = (typeof defaultConfig !== 'undefined') ? { ...defaultConfig } : {}; 
     let currentScreen = 'welcome';
     let participantData = null;
     let currentQuestion = 0;
@@ -18,10 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let timerInterval = null;
     let timeLeft = 10;
     
-    // Key lưu cache
-    const STORAGE_KEY = 'quiz_user_session_v8_final'; 
-
-    // Cấu hình quy đổi điểm (Giữ nguyên logic của bạn)
+    // Cấu hình quy đổi điểm
     const CERTIFICATE_MAPPING = {
         en: [
             { min: 0, label: "Tiếng Anh Cơ Bản", advice: "Hãy tập trung xây dựng lại nền tảng từ vựng và ngữ pháp.", course: "Tiếng Anh Lấy Lại Căn Bản" },
@@ -54,59 +60,40 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ============================================================
-    // --- 2. HÀM GỬI DỮ LIỆU (QUAN TRỌNG NHẤT) ---
+    // --- 2. HÀM GỬI DỮ LIỆU ---
     // ============================================================
-    // --- THAY THẾ HÀM CŨ BẰNG HÀM NÀY ĐỂ DEBUG ---
-async function sendDataToGoogleSheet(data) {
-    if (!data) {
-        console.error("❌ LỖI: Không có dữ liệu đầu vào (data is null)");
-        return;
+    async function sendDataToGoogleSheet(data) {
+        if (!data) return;
+
+        const formData = new FormData();
+        formData.append("id", data.zalo_user_id || "GUEST_" + Date.now()); 
+        formData.append("fullname", data.full_name || "Khách ẩn danh"); 
+        formData.append("phone", data.phone_number || ""); 
+        formData.append("language", data.language || "en"); 
+        formData.append("score", data.score || 0); 
+        formData.append("qr_code", window.location.href); 
+
+        formData.append("email", data.email || "");
+        formData.append("school_name", data.school_name || "");
+        let noteInfo = `Prize: ${data.prize_won || "None"} | Level: ${data.level || ""}`;
+        formData.append("ghi_chu", noteInfo);
+
+        if (data.writing_responses && data.writing_responses.length > 0) {
+            formData.append("writing", data.writing_responses.join(" | "));
+        }
+
+        try {
+            await fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                body: formData,
+                mode: 'no-cors' 
+            });
+            console.log("✅ Data sent to Sheet");
+        } catch (error) {
+            console.error("❌ Send Error:", error);
+        }
     }
 
-    const formData = new FormData();
-
-    // 1. Map key cho khớp với Bizfly
-    formData.append("id", data.zalo_user_id || "GUEST_" + Date.now()); 
-    formData.append("fullname", data.full_name || "Khách ẩn danh"); 
-    formData.append("phone", data.phone_number || ""); 
-    formData.append("language", data.language || "en"); 
-    formData.append("score", data.score || 0); 
-    formData.append("qr_code", window.location.href); 
-
-    // 2. Dữ liệu phụ
-    formData.append("email", data.email || "");
-    formData.append("school_name", data.school_name || "");
-    let noteInfo = `Prize: ${data.prize_won || "None"} | Level: ${data.level || ""}`;
-    formData.append("ghi_chu", noteInfo);
-
-    if (data.writing_responses && data.writing_responses.length > 0) {
-        formData.append("writing", data.writing_responses.join(" | "));
-    }
-
-    // --- 🔍 LOG KIỂM TRA DỮ LIỆU TRƯỚC KHI GỬI (DEBUG) ---
-    console.log("-----------------------------------------");
-    console.log("🚀 ĐANG CHUẨN BỊ GỬI DỮ LIỆU ĐI:");
-    console.log("🌍 URL đích:", GOOGLE_SCRIPT_URL);
-    console.log("📦 Dữ liệu đóng gói (FormData):");
-    for (var pair of formData.entries()) {
-        console.log(`   👉 ${pair[0]}: ${pair[1]}`);
-    }
-    console.log("-----------------------------------------");
-
-    try {
-        // Lưu ý: mode 'no-cors' sẽ KHÔNG trả về nội dung response (Success/Error)
-        // Nó chỉ báo là đã gửi lệnh đi thành công hay chưa thôi.
-        await fetch(GOOGLE_SCRIPT_URL, {
-            method: 'POST',
-            body: formData,
-            mode: 'no-cors' 
-        });
-        console.log("✅ Đã gửi request thành công! (Kiểm tra bên Google Sheet xem có dòng mới chưa)");
-    } catch (error) {
-        console.error("❌ LỖI GỬI DỮ LIỆU (NETWORK ERROR):", error);
-        alert("Lỗi kết nối! Vui lòng kiểm tra internet.");
-    }
-}
     // ============================================================
     // --- 3. CÁC HÀM HỖ TRỢ LOGIC ---
     // ============================================================
@@ -131,7 +118,6 @@ async function sendDataToGoogleSheet(data) {
     }
 
     function getStudentRank(score, language) {
-        // Logic tìm kỹ năng yếu
         let weakestSkill = '';
         let minSkillScore = 100;
         for (const [cat, data] of Object.entries(skillMetrics)) {
@@ -183,33 +169,60 @@ async function sendDataToGoogleSheet(data) {
     // --- 4. XỬ LÝ SỰ KIỆN (EVENT LISTENERS) ---
     // ============================================================
 
-    // --- NÚT START ---
+    // --- NÚT START (Logic kiểm tra người chơi cũ) ---
     const startBtn = document.getElementById('start-btn');
     if (startBtn) {
         startBtn.addEventListener('click', () => {
             const savedData = getSession();
-            if (savedData) {
+
+            // 1. NGƯỜI DÙNG CŨ (Đã hoàn thành bài thi)
+            if (savedData && savedData.completed_at) {
+                console.log("Welcome back:", savedData);
+                
+                // Khôi phục dữ liệu
+                participantData = savedData;
+                score = savedData.score || 0;
+                
+                // Đảm bảo load được câu hỏi để hiển thị giao diện kết quả
+                if (typeof setQuestionsByLanguageAndLevel === 'function') {
+                    // Nếu không biết user thi đề nào, load mặc định en/medium để tránh lỗi
+                    const lang = savedData.language || 'en';
+                    const level = savedData.level || 'medium';
+                    setQuestionsByLanguageAndLevel(lang, level);
+                }
+
+                showScreen('results');
+                showResults(); // Render lại kết quả
+                
+                // Thông báo nhẹ
+                // alert(`Chào mừng ${savedData.full_name} quay lại! Đây là kết quả bài thi trước của bạn.`);
+                return;
+            }
+
+            // 2. NGƯỜI DÙNG ĐANG THI DỞ (Đã điền form nhưng chưa xong)
+            if (savedData && savedData.full_name) {
                 participantData = savedData;
                 participantData.language = 'en'; 
                 participantData.level = 'medium';
                 
                 if (typeof setQuestionsByLanguageAndLevel === 'function') {
-                    const isLoaded = setQuestionsByLanguageAndLevel('en', 'medium'); 
-                    if (isLoaded) {
+                    if (setQuestionsByLanguageAndLevel('en', 'medium')) {
                         initSkillTracker(); 
                         showScreen('quiz');
                         renderQuestion();
                     } else {
-                        alert("Lỗi hệ thống: Không tìm thấy dữ liệu câu hỏi.");
+                        alert("Lỗi dữ liệu câu hỏi.");
                     }
                 }
-            } else {
+            } 
+            // 3. NGƯỜI MỚI HOÀN TOÀN
+            else {
                 showScreen('form'); 
             }
         });
     }
 
-    // --- SUBMIT FORM THÔNG TIN (QUAN TRỌNG) ---
+    // --- SUBMIT FORM THÔNG TIN ---
     const infoForm = document.getElementById('info-form');
     if (infoForm) {
         infoForm.addEventListener('submit', async (e) => {
@@ -220,9 +233,7 @@ async function sendDataToGoogleSheet(data) {
             submitBtn.innerHTML = 'Đang xử lý... ⏳';
             submitBtn.disabled = true;
 
-            // TẠO ID CHUẨN (U + Timestamp)
             let customId = 'U' + Math.floor(Date.now() / 1000);
-
             const fullName = document.getElementById('full-name').value.trim();
             const schoolName = document.getElementById('school-name').value.trim();
             const phoneNumber = document.getElementById('phone-number').value.trim();
@@ -247,19 +258,17 @@ async function sendDataToGoogleSheet(data) {
                 language: 'en',
                 level: 'medium',
                 writing_responses: [],
-                completed_at: new Date().toISOString(),
+                completed_at: null, // Chưa hoàn thành
                 prize_won: ''
             };
             
             saveSession(participantData);
-            
-            // GỬI DỮ LIỆU ĐI NGAY LẬP TỨC
             await sendDataToGoogleSheet(participantData);
             
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
 
-            // VÀO THI NGAY
+            // Vào thi
             participantData.language = 'en'; 
             participantData.level = 'all'; 
 
@@ -272,7 +281,7 @@ async function sendDataToGoogleSheet(data) {
         });
     }
 
-    // --- XỬ LÝ NÚT CHỌN NGÔN NGỮ/LEVEL (GIỮ NGUYÊN) ---
+    // --- CHỌN LANGUAGE / LEVEL ---
     const langButtons = document.querySelectorAll('.lang-btn');
     langButtons.forEach(btn => {
         btn.addEventListener('click', function() {
@@ -305,7 +314,7 @@ async function sendDataToGoogleSheet(data) {
         });
     });
 
-    // --- NAVIGATION BUTTONS ---
+    // --- NAVIGATION ---
     const nextBtn = document.getElementById('next-btn');
     if (nextBtn) nextBtn.addEventListener('click', nextQuestion);
 
@@ -340,8 +349,8 @@ async function sendDataToGoogleSheet(data) {
                 const percent = (timeLeft / totalTime) * 100;
                 timerBar.style.width = `${percent}%`;
                 if (timeLeft <= 5) {
-                    timerBar.classList.remove('bg-yellow-400', 'shadow-[0_0_10px_rgba(250,204,21,0.8)]');
-                    timerBar.classList.add('bg-red-500', 'shadow-[0_0_10px_rgba(239,68,68,0.8)]');
+                    timerBar.classList.remove('bg-yellow-400');
+                    timerBar.classList.add('bg-red-500');
                 }
             }
             if (timeLeft <= 0) {
@@ -408,7 +417,6 @@ async function sendDataToGoogleSheet(data) {
         disableNextButton(); 
 
         if (q.type === 'writing') {
-            // Logic Render Writing Question
             const wrapper = document.createElement('div');
             wrapper.className = "flex flex-col w-full gap-3 mt-2"; 
             
@@ -604,11 +612,18 @@ async function sendDataToGoogleSheet(data) {
         document.getElementById('next-btn-icon').textContent = '➡️';
     }
 
-    // --- KẾT QUẢ & GỬI DỮ LIỆU LẦN CUỐI ---
+    // --- KẾT QUẢ & GỬI DỮ LIỆU CUỐI ---
     async function showResults() {
+        // --- XỬ LÝ NẾU RELOAD TRANG (correctCount bị reset về 0) ---
+        if (score > 0 && correctCount === 0 && questions && questions.length > 0) {
+            correctCount = Math.round((score * questions.length) / 100);
+        }
+
         score = Math.round(score); 
         if (score > 100) score = 100;
-        const percentage = Math.round((correctCount / questions.length) * 100);
+        
+        const totalQ = (questions && questions.length > 0) ? questions.length : 1;
+        const percentage = Math.round((correctCount / totalQ) * 100);
         const isWinner = score >= 80; 
 
         const currentLang = (participantData && participantData.language) ? participantData.language : 'en';
@@ -655,35 +670,23 @@ async function sendDataToGoogleSheet(data) {
         let skillsContainer = document.getElementById('skills-breakdown');
         if (skillsContainer) skillsContainer.innerHTML = ''; 
 
-        // Xử lý quà tặng
+        // Quà tặng
         const unlockMsg = document.getElementById('unlock-message');
         const spinBtn = document.getElementById('spin-wheel-btn'); 
         if (spinBtn) spinBtn.classList.add('hidden');
-if (isWinner) {
+        if (isWinner) {
             participantData.prize_won = "Móc Khóa HTO";
-            
-            // Hiển thị thông báo trúng quà
             if (unlockMsg) {
                 unlockMsg.classList.remove('hidden');
-                
-                // --- SỬA TẠI ĐÂY ---
-                // 1. Đã bỏ 'animate-bounce' (nhảy nhảy)
-                // 2. Thêm 'transition-all duration-700' để hiện ra mượt mà hơn
                 unlockMsg.className = "mb-6 p-1 border-2 border-blue-400 bg-blue-50 rounded-2xl shadow-lg transition-all duration-700 ease-in-out"; 
-                
                 unlockMsg.innerHTML = `
                     <div class="p-4 text-center">
-                      
-                        
                         <div class="font-black text-xl text-blue-700 uppercase mb-1">CHÚC MỪNG BẠN!</div>
                         <div class="text-sm text-blue-800 font-medium mb-3">Bạn nhận được quà tặng đặc biệt</div>
-                        
                         <div class="bg-white p-3 rounded-xl border border-blue-200 shadow-sm flex items-center justify-center gap-3">
                             <img src="https://eu-central.storage.cloudconvert.com/tasks/e33f0b51-5e8a-4874-9925-25c1ccbc934d/t%E1%BA%A3i%20xu%E1%BB%91ng.webp?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=cloudconvert-production%2F20260203%2Ffra%2Fs3%2Faws4_request&X-Amz-Date=20260203T092309Z&X-Amz-Expires=86400&X-Amz-Signature=6b782b56aa4c46e53abab26eec70c697e2b176796b415f9f09175b4c01373eea&X-Amz-SignedHeaders=host&response-content-disposition=inline%3B%20filename%3D%22t%3Fi%20xu%3Fng.webp%22%3B%20filename%2A%3DUTF-8%27%27t%25E1%25BA%25A3i%2520xu%25E1%25BB%2591ng.webp&response-content-type=image%2Fwebp&x-id=GetObject" alt="Móc khóa" class="w-14 h-14 object-contain drop-shadow-md">
-                            
                             <span class="text-lg font-bold text-gray-800">MÓC KHÓA HTO</span>
                         </div>
-                        
                         <div class="mt-3 text-[11px] text-blue-600 font-bold uppercase tracking-wider">
                             *Liên hệ với HTO Group để nhận quà
                         </div>
@@ -693,13 +696,18 @@ if (isWinner) {
             if (typeof createConfetti === 'function') createConfetti();
         }
 
-        // --- GỬI DỮ LIỆU CUỐI CÙNG (CẬP NHẬT ĐIỂM VÀ RANK) ---
+        // --- CẬP NHẬT DỮ LIỆU & GỬI LẦN CUỐI ---
         if (participantData) {
             participantData.score = score;
             participantData.rank = rankInfo.label;
+            // Đánh dấu đã hoàn thành (quan trọng để chặn thi lại)
+            if(!participantData.completed_at) {
+                participantData.completed_at = new Date().toISOString();
+            }
             saveSession(participantData); 
 
-            // Gọi hàm gửi đi
+            // Chỉ gửi nếu chưa gửi kết quả lần này
+            // (Tuy nhiên ở đây ta cứ gửi đè để update điểm chính xác nhất)
             if (typeof sendDataToGoogleSheet === 'function') {
                 showLoading(true);
                 try {
@@ -715,7 +723,6 @@ if (isWinner) {
     }
 
     // --- CÁC NÚT LIÊN HỆ (Zalo / Messenger) ---
-    // Đã gộp vào đây để tránh trùng lặp sự kiện
     const messengerBtn = document.getElementById('messenger-btn');
     if (messengerBtn) {
         messengerBtn.addEventListener('click', () => {
@@ -751,12 +758,58 @@ if (isWinner) {
         }
     }
     if (window.elementSdk) {
-        window.elementSdk.init({ defaultConfig, onConfigChange });
+        window.elementSdk.init({ defaultConfig, onConfigChange: () => {} });
     }
     initDataSDK();
+
+    // ============================================================
+    // --- 5. DEV TOOL: NÚT RESET DỮ LIỆU (CẤU HÌNH) ---
+    // ============================================================
+    function addDevResetButton() {
+        // Nếu đang khóa (IS_LOCK = true) thì thoát luôn, không vẽ nút
+        if (IS_LOCK) return;
+
+        const btn = document.createElement('button');
+        btn.innerHTML = '🔄 RESET DATA';
+        btn.title = "Click để xóa dữ liệu test và làm lại từ đầu";
+        
+        // Style nút: Góc trái dưới, màu đỏ
+        btn.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 99999;
+            background-color: #ef4444; 
+            color: white;
+            font-weight: bold;
+            padding: 8px 12px;
+            border: 2px solid white;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            font-family: sans-serif;
+            font-size: 11px;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        `;
+        
+        btn.onmouseover = () => btn.style.opacity = "1";
+        btn.onmouseout = () => btn.style.opacity = "0.8";
+
+        btn.addEventListener('click', () => {
+            if(confirm("⚠️ CHẾ ĐỘ TEST:\nBạn có chắc muốn xóa sạch dữ liệu cũ để thi lại không?")) {
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload(); 
+            }
+        });
+
+        document.body.appendChild(btn);
+    }
+
+    addDevResetButton();
 });
 
-// Hàm Confetti độc lập (Nếu chưa có)
+// Hàm Confetti độc lập
 function createConfetti() {
     const container = document.getElementById('confetti-container');
     if(!container) return;
