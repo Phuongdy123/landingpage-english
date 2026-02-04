@@ -12,61 +12,107 @@ const defaultConfig = {
 // --- 1. KHO 50 CÂU HỎI TIẾNG ANH (CƠ BẢN - DỄ) ---
 // ============================================================
 const englishQuestionPool = [
-    // --- GRAMMAR (Ngữ pháp cơ bản) ---
-    { id: 1, type: "multiple_choice", category: "GRAMMAR", question: "I ______ a student.", options: ["is", "are", "am", "be"], correct: 2 },
-    { id: 2, type: "multiple_choice", category: "GRAMMAR", question: "She ______ to school every day.", options: ["go", "goes", "going", "went"], correct: 1 },
-    { id: 3, type: "multiple_choice", category: "GRAMMAR", question: "They ______ playing football now.", options: ["is", "am", "are", "be"], correct: 2 },
-    { id: 4, type: "multiple_choice", category: "GRAMMAR", question: "______ you like pizza?", options: ["Do", "Does", "Is", "Are"], correct: 0 },
-    { id: 5, type: "multiple_choice", category: "GRAMMAR", question: "Yesterday, I ______ to the park.", options: ["go", "goes", "went", "gone"], correct: 2 },
-    { id: 6, type: "multiple_choice", category: "GRAMMAR", question: "He is ______ than his brother.", options: ["tall", "taller", "tallest", "more tall"], correct: 1 },
-    { id: 7, type: "multiple_choice", category: "GRAMMAR", question: "This is ______ book.", options: ["my", "mine", "I", "me"], correct: 0 },
-    { id: 8, type: "multiple_choice", category: "GRAMMAR", question: "There ______ two cats in the room.", options: ["is", "are", "am", "be"], correct: 1 },
-    { id: 9, type: "multiple_choice", category: "GRAMMAR", question: "______ do you live?", options: ["What", "Who", "Where", "When"], correct: 2 },
-    { id: 10, type: "multiple_choice", category: "GRAMMAR", question: "I can ______ English.", options: ["speak", "speaks", "speaking", "to speak"], correct: 0 },
-    { id: 11, type: "multiple_choice", category: "GRAMMAR", question: "She ______ have a car.", options: ["don't", "doesn't", "isn't", "aren't"], correct: 1 },
-    { id: 12, type: "multiple_choice", category: "GRAMMAR", question: "We ______ TV last night.", options: ["watch", "watches", "watched", "watching"], correct: 2 },
-    { id: 13, type: "multiple_choice", category: "GRAMMAR", question: "Can you ______ me?", options: ["help", "helps", "helping", "to help"], correct: 0 },
-    { id: 14, type: "multiple_choice", category: "GRAMMAR", question: "______ is your name?", options: ["Who", "What", "Where", "How"], correct: 1 },
-    { id: 15, type: "multiple_choice", category: "GRAMMAR", question: "My mother is a doctor. ______ works in a hospital.", options: ["He", "She", "It", "They"], correct: 1 },
-    { id: 16, type: "multiple_choice", category: "GRAMMAR", question: "Look! It ______ raining.", options: ["is", "are", "am", "was"], correct: 0 },
-    { id: 17, type: "multiple_choice", category: "GRAMMAR", question: "I usually get up ______ 6 o'clock.", options: ["in", "on", "at", "to"], correct: 2 },
-    { id: 18, type: "multiple_choice", category: "GRAMMAR", question: "______ is this pen? - It's $5.", options: ["How many", "How much", "How often", "How long"], correct: 1 },
-    { id: 19, type: "multiple_choice", category: "GRAMMAR", question: "They ______ not happy yesterday.", options: ["was", "were", "did", "do"], correct: 1 },
-    { id: 20, type: "multiple_choice", category: "GRAMMAR", question: "Would you like ______ coffee?", options: ["some", "any", "a", "an"], correct: 0 },
+    // ============================================================
+    // --- 1. GRAMMAR (Ngữ pháp cơ bản & phổ thông) ---
+    // ============================================================
+    // Tenses (Các thì cơ bản: Quá khứ, Hiện tại hoàn thành, Tương lai)
+    { id: 1, type: "multiple_choice", category: "GRAMMAR", question: "Last summer, I ______ to Da Nang with my family.", options: ["go", "goes", "went", "have gone"], correct: 2 },
+    { id: 2, type: "multiple_choice", category: "GRAMMAR", question: "She ______ English for 5 years.", options: ["learns", "has learned", "is learning", "learned"], correct: 1 },
+    { id: 3, type: "multiple_choice", category: "GRAMMAR", question: "Look! The bus ______.", options: ["comes", "is coming", "came", "will come"], correct: 1 },
+    
+    // Comparisons (So sánh hơn/nhất)
+    { id: 4, type: "multiple_choice", category: "GRAMMAR", question: "Ho Chi Minh City is ______ than Hanoi.", options: ["big", "biger", "bigger", "more big"], correct: 2 },
+    { id: 5, type: "multiple_choice", category: "GRAMMAR", question: "He is the ______ student in my class.", options: ["tall", "taller", "tallest", "most tall"], correct: 2 },
+    
+    // Passive Voice (Câu bị động đơn giản)
+    { id: 6, type: "multiple_choice", category: "GRAMMAR", question: "This house ______ in 1990.", options: ["built", "was built", "is built", "builds"], correct: 1 },
+    
+    // Conditional Type 1 (Câu điều kiện loại 1 - Có thể xảy ra)
+    { id: 7, type: "multiple_choice", category: "GRAMMAR", question: "If it rains, we ______ at home.", options: ["stay", "stayed", "will stay", "would stay"], correct: 2 },
+    
+    // Wish (Câu ước đơn giản)
+    { id: 8, type: "multiple_choice", category: "GRAMMAR", question: "I don't have a car. I wish I ______ one.", options: ["have", "had", "will have", "am having"], correct: 1 },
+    
+    // Prepositions of Time (in/on/at)
+    { id: 9, type: "multiple_choice", category: "GRAMMAR", question: "My birthday is ______ May.", options: ["on", "in", "at", "to"], correct: 1 },
+    { id: 10, type: "multiple_choice", category: "GRAMMAR", question: "We usually watch TV ______ night.", options: ["in", "on", "at", "for"], correct: 2 },
+    
+    // Modals (Động từ khuyết thiếu)
+    { id: 11, type: "multiple_choice", category: "GRAMMAR", question: "You ______ stop when the traffic light is red.", options: ["can", "must", "may", "will"], correct: 1 },
+    { id: 12, type: "multiple_choice", category: "GRAMMAR", question: "I ______ swim when I was 5 years old.", options: ["can", "could", "should", "must"], correct: 1 },
+    
+    // Articles (a/an/the)
+    { id: 13, type: "multiple_choice", category: "GRAMMAR", question: "My father is ______ engineer.", options: ["a", "an", "the", "Ø"], correct: 1 },
+    
+    // Question Words (Từ để hỏi)
+    { id: 14, type: "multiple_choice", category: "GRAMMAR", question: "______ do you go to school? - By bus.", options: ["What", "Where", "How", "When"], correct: 2 },
+    
+    // Gerunds (V_ing sau động từ yêu thích)
+    { id: 15, type: "multiple_choice", category: "GRAMMAR", question: "She enjoys ______ books in her free time.", options: ["read", "to read", "reading", "reads"], correct: 2 },
+    
+    // Because / Although
+    { id: 16, type: "multiple_choice", category: "GRAMMAR", question: "______ he was tired, he finished his homework.", options: ["Because", "So", "Although", "But"], correct: 2 },
+    
+    // Used to
+    { id: 17, type: "multiple_choice", category: "GRAMMAR", question: "I used to ______ football when I was a child.", options: ["play", "playing", "played", "plays"], correct: 0 },
+    
+    // Relative Clause simple (Who/Which)
+    { id: 18, type: "multiple_choice", category: "GRAMMAR", question: "This is the book ______ I bought yesterday.", options: ["who", "which", "where", "when"], correct: 1 },
+    
+    // Tag Question simple
+    { id: 19, type: "multiple_choice", category: "GRAMMAR", question: "You are a student, ______?", options: ["are you", "aren't you", "do you", "don't you"], correct: 1 },
+    
+    // Suggestion
+    { id: 20, type: "multiple_choice", category: "GRAMMAR", question: "Let's ______ to the cinema.", options: ["go", "going", "to go", "went"], correct: 0 },
 
-    // --- VOCABULARY (Từ vựng thông dụng) ---
-    { id: 21, type: "multiple_choice", category: "VOCABULARY", question: "Which animal says 'Meow'?", options: ["Dog", "Cat", "Cow", "Pig"], correct: 1 },
-    { id: 22, type: "multiple_choice", category: "VOCABULARY", question: "Apple is a ______.", options: ["Fruit", "Vegetable", "Meat", "Drink"], correct: 0 },
-    { id: 23, type: "multiple_choice", category: "VOCABULARY", question: "My mother’s sister is my ______.", options: ["uncle", "aunt", "cousin", "niece"], correct: 1 },
-    { id: 24, type: "multiple_choice", category: "VOCABULARY", question: "We sleep in the ______.", options: ["Kitchen", "Bathroom", "Bedroom", "Garage"], correct: 2 },
-    { id: 25, type: "multiple_choice", category: "VOCABULARY", question: "The opposite of 'Big' is ______.", options: ["Small", "Tall", "Fat", "Long"], correct: 0 },
-    { id: 26, type: "multiple_choice", category: "VOCABULARY", question: "We eat breakfast in the ______.", options: ["morning", "afternoon", "evening", "night"], correct: 0 },
-    { id: 27, type: "multiple_choice", category: "VOCABULARY", question: "Blue and Yellow make ______.", options: ["Red", "Green", "Orange", "Purple"], correct: 1 },
-    { id: 28, type: "multiple_choice", category: "VOCABULARY", question: "A person who flies a plane is a ______.", options: ["driver", "pilot", "doctor", "farmer"], correct: 1 },
-    { id: 29, type: "multiple_choice", category: "VOCABULARY", question: "We use a ______ to cut paper.", options: ["knife", "scissors", "spoon", "fork"], correct: 1 },
-    { id: 30, type: "multiple_choice", category: "VOCABULARY", question: "Monday, Tuesday, ______.", options: ["Thursday", "Friday", "Wednesday", "Sunday"], correct: 2 },
-    { id: 31, type: "multiple_choice", category: "VOCABULARY", question: "The sun is ______.", options: ["hot", "cold", "wet", "dark"], correct: 0 },
-    { id: 32, type: "multiple_choice", category: "VOCABULARY", question: "I have two hands and ten ______.", options: ["legs", "fingers", "arms", "heads"], correct: 1 },
-    { id: 33, type: "multiple_choice", category: "VOCABULARY", question: "You read a ______.", options: ["book", "pen", "table", "chair"], correct: 0 },
-    { id: 34, type: "multiple_choice", category: "VOCABULARY", question: "Summer is usually ______.", options: ["cold", "snowy", "hot", "rainy"], correct: 2 },
-    { id: 35, type: "multiple_choice", category: "VOCABULARY", question: "A dog has four ______.", options: ["hands", "legs", "arms", "noses"], correct: 1 },
-    { id: 36, type: "multiple_choice", category: "VOCABULARY", question: "Water is ______.", options: ["solid", "liquid", "gas", "food"], correct: 1 },
-    { id: 37, type: "multiple_choice", category: "VOCABULARY", question: "My father drives a ______.", options: ["car", "house", "pen", "book"], correct: 0 },
-    { id: 38, type: "multiple_choice", category: "VOCABULARY", question: "Fish live in ______.", options: ["sky", "water", "land", "tree"], correct: 1 },
-    { id: 39, type: "multiple_choice", category: "VOCABULARY", question: "I wear ______ on my feet.", options: ["hat", "shoes", "gloves", "shirt"], correct: 1 },
-    { id: 40, type: "multiple_choice", category: "VOCABULARY", question: "Five + Five = ______.", options: ["Nine", "Ten", "Eleven", "Eight"], correct: 1 },
+    // ============================================================
+    // --- 2. VOCABULARY (Từ vựng đời sống thường ngày) ---
+    // ============================================================
+    { id: 21, type: "multiple_choice", category: "VOCABULARY", question: "We usually cook meals in the ______.", options: ["bedroom", "bathroom", "kitchen", "living room"], correct: 2 },
+    { id: 22, type: "multiple_choice", category: "VOCABULARY", question: "My mother's brother is my ______.", options: ["aunt", "uncle", "cousin", "grandfather"], correct: 1 },
+    { id: 23, type: "multiple_choice", category: "VOCABULARY", question: "Which animal is very big and has a long nose?", options: ["Lion", "Monkey", "Elephant", "Tiger"], correct: 2 },
+    { id: 24, type: "multiple_choice", category: "VOCABULARY", question: "The opposite of 'Fast' is ______.", options: ["Slow", "Quick", "Hard", "Easy"], correct: 0 },
+    { id: 25, type: "multiple_choice", category: "VOCABULARY", question: "You need a ______ to buy things at the supermarket.", options: ["passport", "money", "ticket", "map"], correct: 1 },
+    { id: 26, type: "multiple_choice", category: "VOCABULARY", question: "It is very ______ in summer.", options: ["cold", "hot", "snowy", "freezing"], correct: 1 },
+    { id: 27, type: "multiple_choice", category: "VOCABULARY", question: "A person who teaches students is a ______.", options: ["doctor", "farmer", "teacher", "driver"], correct: 2 },
+    { id: 28, type: "multiple_choice", category: "VOCABULARY", question: "Yellow + Red = ______.", options: ["Blue", "Green", "Orange", "Black"], correct: 2 },
+    { id: 29, type: "multiple_choice", category: "VOCABULARY", question: "I have a headache. I should go to the ______.", options: ["school", "market", "doctor", "park"], correct: 2 },
+    { id: 30, type: "multiple_choice", category: "VOCABULARY", question: "We have breakfast in the ______.", options: ["morning", "afternoon", "evening", "night"], correct: 0 },
+    { id: 31, type: "multiple_choice", category: "VOCABULARY", question: "Football, Tennis, and Swimming are ______.", options: ["subjects", "sports", "food", "music"], correct: 1 },
+    { id: 32, type: "multiple_choice", category: "VOCABULARY", question: "Please turn ______ the lights before you leave.", options: ["on", "off", "up", "in"], correct: 1 },
+    { id: 33, type: "multiple_choice", category: "VOCABULARY", question: "Can I ______ your pen, please?", options: ["lend", "borrow", "give", "take"], correct: 1 },
+    { id: 34, type: "multiple_choice", category: "VOCABULARY", question: "Ha Long Bay is a famous ______ in Vietnam.", options: ["city", "food", "landmark", "school"], correct: 2 },
+    { id: 35, type: "multiple_choice", category: "VOCABULARY", question: "I am thirsty. I want to drink ______.", options: ["bread", "water", "rice", "apple"], correct: 1 },
+    { id: 36, type: "multiple_choice", category: "VOCABULARY", question: "The ______ rises in the East.", options: ["Moon", "Star", "Sun", "Earth"], correct: 2 },
+    { id: 37, type: "multiple_choice", category: "VOCABULARY", question: "Tet is the Lunar New ______.", options: ["Month", "Year", "Week", "Day"], correct: 1 },
+    { id: 38, type: "multiple_choice", category: "VOCABULARY", question: "My sister is very ______. She helps everyone.", options: ["kind", "lazy", "bad", "angry"], correct: 0 },
+    { id: 39, type: "multiple_choice", category: "VOCABULARY", question: "How ______ is this shirt? - It's 100,000 VND.", options: ["many", "long", "much", "old"], correct: 2 },
+    { id: 40, type: "multiple_choice", category: "VOCABULARY", question: "Where are you ______? - I am from Vietnam.", options: ["come", "from", "go", "live"], correct: 1 },
 
-    // --- WRITING (Điền từ đơn giản) ---
-    { id: 41, type: "writing", category: "WRITING", question: "Write the opposite of 'Hot'.", correctAnswer: "cold" },
-    { id: 42, type: "writing", category: "WRITING", question: "Write the number 12 in words.", correctAnswer: "twelve" },
-    { id: 43, type: "writing", category: "WRITING", question: "Hello, how _____ you?", correctAnswer: "are" },
-    { id: 44, type: "writing", category: "WRITING", question: "What is your _____? - My name is John.", correctAnswer: "name" },
-    { id: 45, type: "writing", category: "WRITING", question: "I _____ to school by bus.", correctAnswer: "go" },
-    { id: 46, type: "writing", category: "WRITING", question: "Thank you very _____.", correctAnswer: "much" },
-    { id: 47, type: "writing", category: "WRITING", question: "Good morning, Good _____ (buổi chiều).", correctAnswer: "afternoon" },
-    { id: 48, type: "writing", category: "WRITING", question: "One, Two, Three, _____.", correctAnswer: "four" },
-    { id: 49, type: "writing", category: "WRITING", question: "He is a good _____ (học sinh).", correctAnswer: "student" },
-    { id: 50, type: "writing", category: "WRITING", question: "This is _____ apple (mạo từ).", correctAnswer: "an" }
+    // ============================================================
+    // --- 3. WRITING (Điền từ đơn giản) ---
+    // ============================================================
+    // Irregular Verbs (Động từ bất quy tắc)
+    { id: 41, type: "writing", category: "WRITING", question: "Write the past form of 'Go'. (Quá khứ của Go)", correctAnswer: "went" },
+    { id: 42, type: "writing", category: "WRITING", question: "Write the past form of 'Buy'. (Quá khứ của Buy)", correctAnswer: "bought" },
+    
+    // Opposites (Từ trái nghĩa)
+    { id: 43, type: "writing", category: "WRITING", question: "The opposite of 'Big' is ______.", correctAnswer: "small" },
+    { id: 44, type: "writing", category: "WRITING", question: "The opposite of 'Happy' is ______.", correctAnswer: "sad" },
+    
+    // Prepositions (Giới từ)
+    { id: 45, type: "writing", category: "WRITING", question: "I am good ______ Math. (Điền giới từ)", correctAnswer: "at" },
+    { id: 46, type: "writing", category: "WRITING", question: "Wait ______ me! (Đợi tôi với)", correctAnswer: "for" },
+    
+    // Simple Grammar Fill-in
+    { id: 47, type: "writing", category: "WRITING", question: "She ______ (not/go) to school yesterday. (Điền: didn't go)", correctAnswer: "didn't go" },
+    { id: 48, type: "writing", category: "WRITING", question: "There ______ (be) four people in my family. (Điền: are)", correctAnswer: "are" },
+    
+    // Numbers/Words
+    { id: 49, type: "writing", category: "WRITING", question: "One, Two, Three, ______. (Số 4 viết bằng chữ)", correctAnswer: "four" },
+    { id: 50, type: "writing", category: "WRITING", question: "He is a ______ (cầu thủ) football player.", correctAnswer: "good" } // Hoặc chấp nhận nhiều đáp án thì logic check cần sửa, ở đây để 'good' hoặc 'famous' đều hợp lý nhưng code đang check cứng. Ta đổi câu hỏi cho rõ ràng hơn:
+    // SỬA CÂU 50 CHO DỄ HƠN VÀ CHÍNH XÁC:
+    , { id: 50, type: "writing", category: "WRITING", question: "What is your name? - My ______ is Nam.", correctAnswer: "name" }
 ];
 
 // ============================================================
