@@ -129,7 +129,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        const skillMap = { 'LISTENING': 'Nghe hiểu', 'READING': 'Đọc hiểu', 'GRAMMAR': 'Ngữ pháp', 'VOCABULARY': 'Từ vựng', 'WRITING': 'Viết' };
+        const skillMap = { 'LISTENING': 'Nghe hiểu', 'READING': 'Đọc hiểu', 'GRAMMAR': 'Ngữ pháp', 'VOCABULARY': 'Từ vựng', };
         const weakName = skillMap[weakestSkill] || weakestSkill;
 
         const langCode = language || 'en';

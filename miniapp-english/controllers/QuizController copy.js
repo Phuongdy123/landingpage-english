@@ -786,7 +786,6 @@ function renderQuestion() {
                 else if(cat === 'READING') displayCat = '📖 Đọc Hiểu (Reading)';
                 else if(cat === 'GRAMMAR') displayCat = '✍️ Ngữ Pháp (Grammar)';
                 else if(cat === 'VOCABULARY') displayCat = '🔤 Từ Vựng (Vocabulary)';
-                else if(cat === 'WRITING') displayCat = '📝 Kỹ Năng Viết (Writing)';
                 else if(cat === 'NUMBERS') displayCat = '🔢 Số Học (Numbers)';
                 else if(cat === 'GREETING') displayCat = '👋 Giao Tiếp (Greeting)';
 

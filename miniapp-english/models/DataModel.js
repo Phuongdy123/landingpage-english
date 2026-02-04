@@ -9,7 +9,7 @@ const defaultConfig = {
 };
 
 // ============================================================
-// --- 1. KHO 50 CÂU HỎI TIẾNG ANH (CƠ BẢN - DỄ) ---
+// --- 1. KHO 40 CÂU HỎI TIẾNG ANH (TRẮC NGHIỆM) ---
 // ============================================================
 const englishQuestionPool = [
     // ============================================================
@@ -87,32 +87,7 @@ const englishQuestionPool = [
     { id: 37, type: "multiple_choice", category: "VOCABULARY", question: "Tet is the Lunar New ______.", options: ["Month", "Year", "Week", "Day"], correct: 1 },
     { id: 38, type: "multiple_choice", category: "VOCABULARY", question: "My sister is very ______. She helps everyone.", options: ["kind", "lazy", "bad", "angry"], correct: 0 },
     { id: 39, type: "multiple_choice", category: "VOCABULARY", question: "How ______ is this shirt? - It's 100,000 VND.", options: ["many", "long", "much", "old"], correct: 2 },
-    { id: 40, type: "multiple_choice", category: "VOCABULARY", question: "Where are you ______? - I am from Vietnam.", options: ["come", "from", "go", "live"], correct: 1 },
-
-    // ============================================================
-    // --- 3. WRITING (Điền từ đơn giản) ---
-    // ============================================================
-    // Irregular Verbs (Động từ bất quy tắc)
-    { id: 41, type: "writing", category: "WRITING", question: "Write the past form of 'Go'. (Quá khứ của Go)", correctAnswer: "went" },
-    { id: 42, type: "writing", category: "WRITING", question: "Write the past form of 'Buy'. (Quá khứ của Buy)", correctAnswer: "bought" },
-    
-    // Opposites (Từ trái nghĩa)
-    { id: 43, type: "writing", category: "WRITING", question: "The opposite of 'Big' is ______.", correctAnswer: "small" },
-    { id: 44, type: "writing", category: "WRITING", question: "The opposite of 'Happy' is ______.", correctAnswer: "sad" },
-    
-    // Prepositions (Giới từ)
-    { id: 45, type: "writing", category: "WRITING", question: "I am good ______ Math. (Điền giới từ)", correctAnswer: "at" },
-    { id: 46, type: "writing", category: "WRITING", question: "Wait ______ me! (Đợi tôi với)", correctAnswer: "for" },
-    
-    // Simple Grammar Fill-in
-    { id: 47, type: "writing", category: "WRITING", question: "She ______ (not/go) to school yesterday. (Điền: didn't go)", correctAnswer: "didn't go" },
-    { id: 48, type: "writing", category: "WRITING", question: "There ______ (be) four people in my family. (Điền: are)", correctAnswer: "are" },
-    
-    // Numbers/Words
-    { id: 49, type: "writing", category: "WRITING", question: "One, Two, Three, ______. (Số 4 viết bằng chữ)", correctAnswer: "four" },
-    { id: 50, type: "writing", category: "WRITING", question: "He is a ______ (cầu thủ) football player.", correctAnswer: "good" } // Hoặc chấp nhận nhiều đáp án thì logic check cần sửa, ở đây để 'good' hoặc 'famous' đều hợp lý nhưng code đang check cứng. Ta đổi câu hỏi cho rõ ràng hơn:
-    // SỬA CÂU 50 CHO DỄ HƠN VÀ CHÍNH XÁC:
-    , { id: 50, type: "writing", category: "WRITING", question: "What is your name? - My ______ is Nam.", correctAnswer: "name" }
+    { id: 40, type: "multiple_choice", category: "VOCABULARY", question: "Where are you ______? - I am from Vietnam.", options: ["come", "from", "go", "live"], correct: 1 }
 ];
 
 // ============================================================
@@ -199,7 +174,7 @@ var questions = [];
 function setQuestionsByLanguageAndLevel(lang, level) {
     let rawQuestions = [];
 
-    // A. XỬ LÝ RIÊNG CHO TIẾNG ANH (Lấy từ Pool 50 câu)
+    // A. XỬ LÝ RIÊNG CHO TIẾNG ANH (Lấy từ Pool 40 câu)
     if (lang === 'en') {
         rawQuestions = [...englishQuestionPool]; // Copy mảng để không ảnh hưởng dữ liệu gốc
     } 
