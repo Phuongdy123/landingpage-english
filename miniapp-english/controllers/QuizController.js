@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 🔴 CẤU HÌNH DEV TOOL (BẬT/TẮT NÚT RESET)
     // false = Đang Test (HIỆN nút Reset màu đỏ)
     // true  = Chạy thật/Gửi khách (ẨN nút Reset)
-    const IS_LOCK = false; 
+    const IS_LOCK = true; 
 
     // Biến toàn cục
     let config = (typeof defaultConfig !== 'undefined') ? { ...defaultConfig } : {}; 
