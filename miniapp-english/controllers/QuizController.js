@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================================================
     
     // URL Google Apps Script
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz7GnhioT3_PLSrLaYMPnfKKL7zYPlWYBsRHi2HvvLoIMoDRB8mRGVzs75NPkfNPUjwEg/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwHsVPXHJq4RGXjFEGJQYhEjZKRTi-Arsw4EJ9Hk9lfyv1mmtpG2ItMJBGs9kCca4XJ5A/exec';
     
     // Key lưu cache
     const STORAGE_KEY = 'quiz_user_session_v8_final'; 
